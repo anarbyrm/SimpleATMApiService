@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from rest_framework import authentication, generics, permissions, status, views
 from rest_framework.response import Response
 from accounts.models import Account
@@ -6,6 +7,8 @@ from .serializers import (AccountSerializer,
                           AccountBalanceTopUpSerializer,
                           AccountBalanceWithdrawSerializer)
 from .utils import divide_money_into_units
+
+User = get_user_model()
 
 
 class AccountRetrieveCreateView(generics.RetrieveAPIView,
@@ -95,3 +98,14 @@ class AccountBalanceWithdrawView(generics.UpdateAPIView):
                 "balance": updated_account.balance
             }
         })
+
+
+class AccountDestroyView(generics.DestroyAPIView):
+    queryset = Account
+    permission_classes = [permissions.IsAdminUser]
+    authentication_classes = [authentication.TokenAuthentication]
+
+    def get_object(self):
+        username = self.kwargs["username"]
+        user = User.objects.filter(username=username)
+        return Account.objects.get(user=user.first()) if user.exists() else None
