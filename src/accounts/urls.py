@@ -6,5 +6,5 @@ from .views import (AccountRetrieveCreateView,
 urlpatterns = [
     path("accounts/", AccountRetrieveCreateView.as_view()),
     path("accounts/top-up", AccountBalanceTopUpView.as_view()),
-    path("accounts/withdraw", AccountBalanceWithdrawView.as_view())
+    path("accounts/withdraw", AccountBalanceWithdrawView.as_view()),
 ]

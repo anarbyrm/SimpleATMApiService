@@ -26,6 +26,7 @@ class AccountBalanceTopUpView(generics.UpdateAPIView):
     authentication_classes = [authentication.TokenAuthentication]
     permission_classes = [permissions.IsAuthenticated]
     queryset = Account.objects.all()
+    http_method_names = ["patch"]
 
     def patch(self, request):
         account = self.get_object()
@@ -60,6 +61,7 @@ class AccountBalanceWithdrawView(generics.UpdateAPIView):
     authentication_classes = [authentication.TokenAuthentication]
     permission_classes = [permissions.IsAuthenticated]
     queryset = Account.objects.all()
+    http_method_names = ["patch"]
 
     def get_object(self):
         current_user = self.request.user
