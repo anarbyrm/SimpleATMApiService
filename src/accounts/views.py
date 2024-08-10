@@ -1,6 +1,7 @@
 from rest_framework import authentication, generics, permissions, status, views
 from rest_framework.response import Response
 from accounts.models import Account
+from transactions.models import Transaction, TransactionType
 from .serializers import (AccountSerializer,
                           AccountBalanceTopUpSerializer,
                           AccountBalanceWithdrawSerializer)
@@ -36,10 +37,17 @@ class AccountBalanceTopUpView(generics.UpdateAPIView):
             }, status=status.HTTP_400_BAD_REQUEST)
         
         updated_account = serializer.save()
+        topped_up_amount = serializer.validated_data["top_up_amount"]
 
+        Transaction.objects.create(amount=topped_up_amount,
+                                   account=account,
+                                   transaction_type=TransactionType.TOPPED_UP.value)
         return Response({
             "success": True,
-            "data": {"balance": updated_account.balance}
+            "data": {
+                "topped_up_amount": topped_up_amount,
+                "balance": updated_account.balance
+            }
         }, status=status.HTTP_200_OK)
 
     def get_object(self):
@@ -70,6 +78,10 @@ class AccountBalanceWithdrawView(generics.UpdateAPIView):
         updated_account = serializer.save()
         withdrawn_amount = serializer.validated_data["withdraw_amount"]
         unit_dict = divide_money_into_units(withdrawn_amount)
+        
+        Transaction.objects.create(amount=withdrawn_amount,
+                                   account=account,
+                                   transaction_type=TransactionType.WITHDRAWN.value)
 
         return Response({
             "success": True,
