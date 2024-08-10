@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model, authenticate
 from rest_framework import serializers
+from rest_framework.authtoken.models import Token
 
 User = get_user_model()
 
@@ -36,7 +37,10 @@ class UserTokenSerializer(serializers.Serializer):
         
         return True
 
+    def get_authenticated_user(self):
+        return User.objects.filter(username=self.validated_data["username"]).first() if self.is_valid() else None
+
     def create_access_token(self):
-        # imaginary access token for development
-        token = "generated token"
-        return token
+        user = self.get_authenticated_user()
+        token, _is_created = Token.objects.get_or_create(user=user)
+        return token.key

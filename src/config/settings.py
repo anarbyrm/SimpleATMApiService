@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     # thrid-party apps
     'rest_framework',
+    'rest_framework.authtoken',
 
     # project apps
     'accounts',
